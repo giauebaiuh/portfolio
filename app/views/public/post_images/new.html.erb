@@ -1,0 +1,56 @@
+<div class="container">
+  <div class="row">
+    <h1>新規投稿</h1>
+  </div>
+  <% if @post_image.errors.any? %>
+    <%= @post_image.errors.count %>件の入力項目を満たしていません。
+    <ul>
+      <% @post_image.errors.full_messages.each do |message| %>
+      <li><%=message%></li>
+      <%end%>
+    </ul>
+  <%end%>
+
+  <%= form_with model: @post_image do |f| %>
+    <label>写真</label></br>
+    <%= f.file_field :image,accept: "image/*" %></br>
+
+    <label>都道府県</label></br>
+    <%= f.select :prefecture,PostImage.prefectures.keys, {} %></br>
+
+    <label>ジャンル</label></br>
+    <%= f.select :genre,PostImage.genres.keys, {} %></br>
+
+    <label>商品名</label></br>
+    <%= f.text_field :trade_name, class: "" %></br>
+
+    <% if @post_image.id.nil? %>
+      <div class="form-group" id="star">
+        <label>レビュー</label>
+        <%= f.hidden_field :star, id: :review_star, class: 'form-control' %>
+      　<div id="post_raty"></div>
+      </div>
+      <script>
+        $(document).on('turbolinks:load', function() {
+          let elem = document.querySelector('#post_raty');
+          if (elem == null) return;
+          elem.innerHTML = ""
+          let opt = {
+            starOn: "<%= asset_path('star-on.png') %>",
+            starOff: "<%= asset_path('star-off.png') %>",
+            starHalf: "<%= asset_path('star-half.png') %>",
+            scoreName: 'post_image[star]',
+          };
+          raty(elem, opt);
+        });
+      </script>
+    <% else %>
+      <div class="form-group">
+        <%= render "static_rate", post_image: post_image %>
+      </div>
+    <% end %>
+    <label>コメント</label></br>
+    <%= f.text_area :caption, class: "form-control"%>
+    <%= f.submit "投稿" %>
+  <%end%>
+</div>

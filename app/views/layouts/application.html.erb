@@ -1,16 +1,56 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Portfolio</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>oshiomiya</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <script src="https://kit.fontawesome.com/e8b791ab90.js" crossorigin="anonymous"></script>
+    <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="d-flex flex-column vh-100">
+    <header class="shadow-sm">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+          <a class="navbar-brand p-2" href="/post_images"><i class="fa-solid fa-gift"></i><span>推しおみや</span></a>
+          <botton class="navbar-toggler" type="botton" data-toggle="collapse" data-target="#navbarNavDropdown" area-controls="navbarNavDropdown" area-expnaded="false" area-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </botton>
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ml-auto">
+              <% if user_signed_in? %>
+                <li class="nav-link text-light">
+                  <%= link_to user_path(current_user) do %>
+                  <strong class="text-white"><i class="fa-regular fa-circle-user"></i><span>マイページ</span></strong>
+                  <%end%>
+                </li>
+                <li class="nav-link text-light">
+                  <%= link_to new_post_image_path do %>
+                  <strong class="text-white"><i class="fa-regular fa-pen-to-square"></i><span>新規投稿</span></strong>
+                  <%end%>
+                </li>
+                <li class="nav-link text-light">
+                  <%= link_to(destroy_user_session_path, method: :delete) do %>
+                  <strong class="text-white"><i class="fa-solid fa-right-from-bracket"></i><span>ログアウト</span></strong>
+                  <%end%>
+                </li>
+              <%else%>
+                <li class="nav-link text-light">
+                  <%= link_to(new_user_session_path) do %>
+                  <strong class="text-white"><i class="fa-solid fa-right-to-bracket"></i><span>ログイン</span></strong>
+                  <%end%>
+                </li>
+              <%end%>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="mb-auto px-3">
+      <%= yield %>
+    </main>
   </body>
 </html>

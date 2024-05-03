@@ -1,0 +1,47 @@
+<%= flash[:notice]%>
+<div class="container">
+  <div class="row">
+    <h1 class="col-md-4 text-center">投稿一覧</h1>
+    <div class="col-md-5 offset-3">
+      <p>投稿絞り込み検索</p>
+        <%= form_with(url: search_post_images_path, local: true, method: :get) do |f| %>
+          <label>都道府県</label>
+          <%= f.select :prefecture,PostImage.prefectures.keys, {} %></br>
+          <label>ジャンル</label>
+          <%= f.select :genre,PostImage.genres.keys, {} %>
+          <%= f.submit '検索'%>
+        <% end %>
+    </div>
+  </div>
+  <div class="row">
+    <% @post_images.each do |post_image| %>
+      <div class="col-md-6">
+        <div class="card mx-auto my-2 border">
+          <table class="table table-striped table border-1 text-center">
+            <tr><th>写真</th></tr>
+            <tr>
+              <td>
+                <%= link_to post_image_path(post_image.id) do %>
+                <%= image_tag post_image.get_image(120,120) %>
+                <%end%>
+              </td>
+            </tr>
+            <tr><th>ユーザー</th></tr>
+            <tr>
+              <th>
+                <%= image_tag post_image.user.get_profile_image(70,70), class: "rounded-circle" %></br>
+                <%= post_image.user.name %>
+                <%= render "static_rate", post_image: post_image %>
+              </th>
+            </tr>
+            <tr><th>おみやげ</th></tr>
+            <tr><td><%= link_to post_image.trade_name,post_image_path(post_image.id) %></td></tr>
+            <tr><th>感想</th></tr>
+            <tr><td><%= post_image.caption %></td></tr>
+          </table>
+        </div>
+      </div>
+    <%end%>
+ </div>
+ <%= paginate @post_images %>
+</div>

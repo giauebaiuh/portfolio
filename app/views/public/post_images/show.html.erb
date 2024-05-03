@@ -1,0 +1,67 @@
+<%= flash[:notice] %>
+<div class="container">
+  <div class="row">
+    <h1 class="col text-center">投稿詳細</h1>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mx-auto my-2 border">
+        <table class="table table-striped table border-1 text-center">
+          <tr><th>写真</th></tr>
+          <tr><td><%= image_tag @post_image.get_image(120,120) %></td> </tr>
+          <tr><th>ユーザー</th></tr>
+          <tr>
+            <th>
+              <%= link_to user_path(@post_image.user.id) do  %>
+              <%= image_tag @post_image.user.get_profile_image(70,70),class: "rounded-circle" %></br>
+              <%= @post_image.user.name %>
+              <%end%>
+              <%= render "static_rate", post_image: @post_image %>
+            </th>
+          </tr>
+          <tr><th>おみやげ(<%= @post_image.prefecture %>,<%= @post_image.genre %>)</th></tr>
+          <tr><td><%= @post_image.trade_name %></td></tr>
+          <tr><th>感想</th></tr>
+          <tr><td><%= @post_image.caption %></td></tr>
+        </table>
+      </div>
+
+      <% if @post_image.user == current_user %>
+        <%= link_to "編集", edit_post_image_path(@post_image.id), class: "btn btn-success" %>
+        <%= link_to "投稿削除", post_image_path(@post_image.id), method: :delete, "data-confirm" => "本当に削除しますか？", class: "btn btn-danger" %>
+      <%end%>
+
+      <h3 class="mt-3">コメント</h3>
+      <%= form_with model: [@post_image, @post_comment] do |f| %>
+        <%= f.text_area :body, placeholder: "コメントを入力", class: "w-100"%></br>
+        <%= f.submit "コメント投稿" %>
+      <%end%>
+    </div>
+
+    <div class="col-md-6">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th class="text-center col-3">ユーザー</th>
+            <th class="text-center col-9">コメント</th>
+          </tr>
+        </thead>
+        <% @post_image.post_comments.each do |post_comment| %>
+        <tbody>
+          <tr>
+            <td class="text-center">
+              <%= link_to user_path(post_comment.user_id) do %>
+              <%= image_tag post_comment.user.get_profile_image(50,50),class: "rounded-circle" %>
+              <%= post_comment.user.name %>
+              <%end%>
+            </td>
+            <td>
+              <%= post_comment.body %>
+            </td>
+            <%end%>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin - oshiomiya</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+
+  <body class="d-flex flex-column vh-100">
+    <header class="shadow-sm">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+          <span class="navbar-brand p-2">推しおみや</span>
+          <% if admin_signed_in? %>
+            <%= link_to "ログアウト" ,destroy_admin_session_path, method: :delete, class: "text-light" %>
+          <%end%>
+      </nav>
+    </header>
+    <main class="mb-auto px-3">
+      <%= yield %>
+    </main>
+  </body>
+</html>
