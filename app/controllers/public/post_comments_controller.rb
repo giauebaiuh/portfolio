@@ -1,4 +1,5 @@
 class Public::PostCommentsController < ApplicationController
+  before_action :is_matching_login_user
   def create
     post_image = PostImage.find(params[:post_image_id])
     comment = current_user.post_comments.new(post_comment_params)
@@ -15,6 +16,13 @@ class Public::PostCommentsController < ApplicationController
   private
   def post_comment_params
     params.require(:post_comment).permit(:body)
+  end
+
+  def is_matching_login_user
+    post_comment = PostComment.find(params[:id])
+    unless post_comment.user.id == current_user.id
+      redirect_to post_image_path
+    end
   end
 
 end
