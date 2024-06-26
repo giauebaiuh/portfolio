@@ -7,7 +7,7 @@
     <%= csp_meta_tag %>
 
     <script src="https://kit.fontawesome.com/e8b791ab90.js" crossorigin="anonymous"></script>
-    <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
@@ -39,8 +39,8 @@
                 </li>
               <%else%>
                 <li class="nav-link text-light">
-                  <%= link_to(new_user_session_path) do %>
-                  <strong class="text-white"><i class="fa-solid fa-right-to-bracket"></i><span>ログイン</span></strong>
+                  <%= link_to(new_user_registration_path) do %>
+                  <strong class="text-white"><i class="fa-solid fa-right-to-bracket"></i><span>サインイン</span></strong>
                   <%end%>
                 </li>
               <%end%>
@@ -51,6 +51,13 @@
     </header>
     <main class="mb-auto px-3">
       <%= yield %>
+
+      <span id="back">
+        <a href="#">
+          <%= image_tag asset_path('arrow.png'), data: {"turbolinks"=>false}, class: "arrow" %>
+        </a>
+      </span>
+
     </main>
   </body>
 </html>
