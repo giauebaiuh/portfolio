@@ -3,7 +3,7 @@ require 'rails_helper'
 
 describe '投稿のテスト' do
   let!(:post_image){ FactoryBot.create(:post_image)}
-  let!(:user){FactoryBot.create(:user)}
+  let!(:user){ FactoryBot.create(:user) }
 
   describe 'トップ画面のテスト' do
     before do
@@ -49,39 +49,32 @@ describe '投稿のテスト' do
       it '「投稿」ボタンが表示されているか' do
       expect(page).to have_button '投稿'
       end
-      it '投稿後のリダイレクト先は正しいか' do
+      it '投稿後のリダイレクト先は正しいか', js: true do
         attach_file 'post_image[image]', ('app/assets/images/no_image.jpg')
         select '北海道', from: "post_image[prefecture]"
         select '和菓子', from: "post_image[genre]"
         fill_in 'post_image[trade_name]', with: Faker::Lorem.characters(number: 5)
-        expect(find('3').hover.click)
+        find("img[alt='3']").click 
         fill_in 'post_image[caption]',with: Faker::Lorem.characters(number: 10)
         click_button '投稿'
-        expect(page).to have_current_path post_image_path(Postimage.last)
+        expect(page).to have_current_path post_image_path(PostImage.last)
       end
     end
   end
 
   describe '投稿一覧画面のテスト' do
     before do
-        attach_file 'post_image[image]', ('app/assets/images/no_image.jpg')
-        select '北海道', from: "post_image[prefecture]"
-        select '和菓子', from: "post_image[genre]"
-        fill_in 'post_image[trade_name]', with: Faker::Lorem.characters(number: 5)
-        expect(find('3').hover.click)
-        fill_in 'post_image[caption]',with: Faker::Lorem.characters(number: 10)
-        click_button '投稿'
       visit post_images_path
     end
     context '表示とリンクの確認' do
       it '投稿されたものの一覧と正しくリンクがあるか' do
-        expect(page).to have_content post_image
-        expect(page).to have_link post_image
+        id_attribute = find('#body > main > div > div:nth-child(2) > div:nth-child(1) > div > table:nth-child(1)')['id']
+        expect(id_attribute).to eq 'body > main > div > div:nth-child(2) > div:nth-child(1) > div > table:nth-child(1)_id'
+        expect(page).to have_link post_image.id
       end
     end
     context '検索機能が正しく実行されるか' do
       it '検索内容と一致するデータを返すか' do
-        post_image = create(:post_image)
         expect(post_image.search("北海道")).to include(post_image)
         expect(post_image.search("和菓子")).to include(post_image)
       end
@@ -91,11 +84,11 @@ describe '投稿のテスト' do
   describe '詳細画面のテスト' do
     before do
       visit post_image_path(post_image)
-      post_image.user = current_user
+      sign_in user
     end
     context '表示の確認' do
       it '削除リンクが存在しているか' do
-        expect(page).to have_link '投稿削除'
+        expect(page).to have_button '投稿削除'
       end
       it '編集リンクが存在しているか' do
         expect(page).to have_link '編集'
@@ -143,4 +136,22 @@ describe '投稿のテスト' do
       end
     end
   end
+
+  describe '投稿に対してコメントができるか' do
+  before do
+      visit post_images_path
+  end
+  context '表示の確認' do
+    it 'と投稿ボタンが存在しているか' do
+        expect(page).to have_button 'コメント投稿'
+      end
+  end
+  context 'コメント投稿処理の確認' do
+    it '投稿後のリダイレクト先は正しいか' do
+      fill_in 'post_comment[body]', with: Faker::Lorem.characters(number:10)
+      click_button 'コメント投稿'
+      expect(page).to have_current_path post_image_path(post_image)
+    end
+  end
+end
 end

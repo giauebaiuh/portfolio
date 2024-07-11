@@ -28,7 +28,7 @@ RSpec.configure do |config|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
 
     config.before(:each, type: :system ) do
-      driven_by :rack_test
+      driven_by :selenium, using: :headless_chrome
     end
   end
 
