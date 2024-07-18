@@ -13,6 +13,7 @@ import "script.js"
 import "popper.js";
 import "bootstrap";
 import "../stylesheets/application";
+import "../stylesheets/arrow.css"
 
 Rails.start()
 Turbolinks.start()
