@@ -7,7 +7,7 @@
     <%= csp_meta_tag %>
 
     <script src="https://kit.fontawesome.com/e8b791ab90.js" crossorigin="anonymous"></script>
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
@@ -40,7 +40,7 @@
               <%else%>
                 <li class="nav-link text-light">
                   <%= link_to(new_user_registration_path) do %>
-                  <strong class="text-white"><i class="fa-solid fa-right-to-bracket"></i><span>サインイン</span></strong>
+                  <strong class="text-white"><i class="fa-solid fa-right-to-bracket"></i><span>サインアップ</span></strong>
                   <%end%>
                 </li>
               <%end%>
