@@ -13,12 +13,3 @@
  *= require_tree .
  *= require_self
  */
-
-#back{
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-}
-.arrow{
-  width: 50px;
-}
