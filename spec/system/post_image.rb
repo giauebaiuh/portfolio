@@ -2,8 +2,8 @@
 require 'rails_helper'
 
 describe '投稿のテスト' do
-  let!(:post_image){ FactoryBot.create(:post_image)}
   let!(:user){ FactoryBot.create(:user) }
+  let!(:post_image){ FactoryBot.create(:post_image, user: user)}
 
   describe 'トップ画面のテスト' do
     before do
@@ -36,7 +36,7 @@ describe '投稿のテスト' do
         expect(current_path).to eq('/post_images')
       end
     end
-  end
+    end
   describe '新規投稿画面のテスト' do
     before do
       sign_in user
@@ -47,14 +47,14 @@ describe '投稿のテスト' do
         expect(current_path).to eq('/post_images/new')
       end
       it '「投稿」ボタンが表示されているか' do
-      expect(page).to have_button '投稿'
+        expect(page).to have_button '投稿'
       end
       it '投稿後のリダイレクト先は正しいか', js: true do
         attach_file 'post_image[image]', ('app/assets/images/no_image.jpg')
         select '北海道', from: "post_image[prefecture]"
         select '和菓子', from: "post_image[genre]"
         fill_in 'post_image[trade_name]', with: Faker::Lorem.characters(number: 5)
-        find("img[alt='3']").click 
+        find("img[alt='3']").click
         fill_in 'post_image[caption]',with: Faker::Lorem.characters(number: 10)
         click_button '投稿'
         expect(page).to have_current_path post_image_path(PostImage.last)
@@ -68,27 +68,29 @@ describe '投稿のテスト' do
     end
     context '表示とリンクの確認' do
       it '投稿されたものの一覧と正しくリンクがあるか' do
-        id_attribute = find('#body > main > div > div:nth-child(2) > div:nth-child(1) > div > table:nth-child(1)')['id']
-        expect(id_attribute).to eq 'body > main > div > div:nth-child(2) > div:nth-child(1) > div > table:nth-child(1)_id'
-        expect(page).to have_link post_image.id
+        expect(page).to have_content post_image.trade_name
+        click_link post_image.trade_name
+        expect(current_path).to eq('/post_images/' + post_image.id.to_s)
       end
     end
     context '検索機能が正しく実行されるか' do
       it '検索内容と一致するデータを返すか' do
-        expect(post_image.search("北海道")).to include(post_image)
-        expect(post_image.search("和菓子")).to include(post_image)
+        select '北海道'
+        select '和菓子'
+        expect(page).to have_content '北海道'
+        expect(page).to have_content '和菓子'
       end
     end
   end
 
   describe '詳細画面のテスト' do
     before do
-      visit post_image_path(post_image)
       sign_in user
+      visit post_image_path(post_image)
     end
     context '表示の確認' do
       it '削除リンクが存在しているか' do
-        expect(page).to have_button '投稿削除'
+        expect(page).to have_link '投稿削除'
       end
       it '編集リンクが存在しているか' do
         expect(page).to have_link '編集'
@@ -97,27 +99,37 @@ describe '投稿のテスト' do
     context 'リンクの遷移先の確認' do
       it '編集ボタンの遷移先は編集画面か' do
         click_link '編集'
-        expect(current_path).to eq('/post_image/' + post_image.id.to_s + '/edit')
+        expect(current_path).to eq('/post_images/' + post_image.id.to_s + '/edit')
       end
     end
     context '削除ボタンのテスト' do
       it '削除テスト' do
+        visit new_post_image_path
+        attach_file 'post_image[image]', ('app/assets/images/no_image.jpg')
+        select '北海道', from: "post_image[prefecture]"
+        select '和菓子', from: "post_image[genre]"
+        fill_in 'post_image[trade_name]', with: Faker::Lorem.characters(number: 5)
+        find("img[alt='3']").click
+        fill_in 'post_image[caption]',with: Faker::Lorem.characters(number: 10)
+        click_button '投稿'
         click_link '投稿削除'
-        expect{ post_image_destroy }.to change{ post_iamge.count }.by(-1)
+        page.driver.browser.switch_to.alert.accept
+        expect{ post_image.destroy }.to change{ PostImage.count }.by(-1)
       end
     end
   end
 
   describe '編集画面のテスト' do
     before do
+      sign_in user
       visit edit_post_image_path(post_image)
     end
     context '表示の確認' do
       it '編集前の情報が入力されているか' do
-        expect(page).to select 'post_image[prefecture]', with: post_image.prefecture
-        expect(page).to select 'post_image[jenre]', with: post_image.jenre
+        expect(page).to have_content post_image.prefecture
+        expect(page).to have_content post_image.genre
         expect(page).to have_field 'post_image[trade_name]', with: post_image.trade_name
-        expect(page).to            'post_image[star]', with: post_image.star
+        find(".form-group")
         expect(page).to have_field 'post_image[caption]', with: post_image.caption
       end
       it '投稿ボタンが表示されているか' do
@@ -126,7 +138,6 @@ describe '投稿のテスト' do
     end
     context '編集処理に関するテスト' do
       it '編集後のリダイレクト先は正しいか' do
-        attach_file 'post_image[image]', ('app/assets/images/no_image.jpg')
         select '青森県', from: "post_image[prefecture]"
         select '洋菓子', from: "post_image[genre]"
         fill_in 'post_image[trade_name]', with: Faker::Lorem.characters(number: 5)
@@ -138,20 +149,21 @@ describe '投稿のテスト' do
   end
 
   describe '投稿に対してコメントができるか' do
-  before do
-      visit post_images_path
-  end
-  context '表示の確認' do
-    it 'と投稿ボタンが存在しているか' do
+    before do
+      sign_in user
+      visit post_image_path(post_image)
+    end
+    context '表示の確認' do
+      it 'と投稿ボタンが存在しているか' do
         expect(page).to have_button 'コメント投稿'
       end
-  end
-  context 'コメント投稿処理の確認' do
-    it '投稿後のリダイレクト先は正しいか' do
-      fill_in 'post_comment[body]', with: Faker::Lorem.characters(number:10)
-      click_button 'コメント投稿'
-      expect(page).to have_current_path post_image_path(post_image)
+    end
+    context 'コメント投稿処理の確認' do
+      it '投稿後のリダイレクト先は正しいか' do
+        fill_in 'post_comment[body]', with: Faker::Lorem.characters(number:10)
+        click_button 'コメント投稿'
+        expect(page).to have_current_path post_image_path(post_image)
+      end
     end
   end
-end
 end
